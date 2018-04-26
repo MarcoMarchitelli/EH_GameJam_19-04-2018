@@ -9,10 +9,19 @@ public class EnemyController : MonoBehaviour {
 
     float speed;
 
+    Animator animator;
+
+    IEnumerator attackAnimation;
+
+    Collider collider;
+
     private void Start()
     {
         speed = SpawnManager.instance.enemiesSpeed;
-        StartCoroutine(AttackAnimation(new Vector3(0, transform.position.y, 0), speed));
+        animator = GetComponentInChildren<Animator>();
+        collider = GetComponent<Collider>();
+        attackAnimation = AttackAnimation(new Vector3(0, transform.position.y, 0), speed);
+        StartCoroutine(attackAnimation);
     }
 
     IEnumerator AttackAnimation(Vector3 destination, float speed)
@@ -24,11 +33,25 @@ public class EnemyController : MonoBehaviour {
         }
     }
 
+    IEnumerator DeathAnimation(Vector3 destination, float speed = 3f)
+    {
+        while (transform.position != destination)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, destination, speed * Time.deltaTime);
+            yield return null;
+        }
+        Destroy(gameObject);
+    }
+
     public void Die()
     {
         if(SpawnManager.instance.enemiesAlive > 0)
             SpawnManager.instance.enemiesAlive--;
-        Destroy(gameObject);
+        collider.enabled = false;
+        animator.SetTrigger("Death");
+        if(attackAnimation != null)
+            StopCoroutine(attackAnimation);
+        StartCoroutine(DeathAnimation(transform.position + Vector3.up * -7f));
     }
 
 }

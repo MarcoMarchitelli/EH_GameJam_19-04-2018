@@ -33,7 +33,7 @@ public class SpawnManager : MonoBehaviour {
     private void Update()
     {
         timer += Time.deltaTime;
-        if(TimeBetweenSpawn > 1f)
+        if(TimeBetweenSpawn > .8f)
             TimeBetweenSpawn -= timer / TimeBetweenSpawn * 0.0001f;
 
         spawnTimer -= Time.deltaTime;

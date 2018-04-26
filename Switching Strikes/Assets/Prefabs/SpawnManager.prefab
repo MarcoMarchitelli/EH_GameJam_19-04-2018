@@ -51,7 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8727dc0a44562eb4bbec6269fffeb9db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TimeBetweenSpawn: 4
+  TimeBetweenSpawn: 3
   TimeToAddMaxEnemies: 5
   enemiesAlive: 0
   enemiesSpeed: 7

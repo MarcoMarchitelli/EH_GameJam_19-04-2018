@@ -38,6 +38,7 @@ public class PlayerController : MonoBehaviour {
 
     bool hasFinishedAnimation = true;
     bool isAttacking = false;
+    bool isJumping = false;
     bool isFirst = true;
 
     int enemiesKilled = 0;
@@ -48,10 +49,13 @@ public class PlayerController : MonoBehaviour {
 
     IEnumerator attackAnimation;
 
+    Animator animator;
+
     private void Start()
     {
         playerStartPosition = transform.position;
-        meshRenderer = GetComponent<MeshRenderer>();
+        meshRenderer = GetComponentInChildren<MeshRenderer>();
+        animator = GetComponentInChildren<Animator>();
         int randomColorIndex = Random.Range(0, 2);
         if (randomColorIndex == 0)
         {
@@ -74,30 +78,34 @@ public class PlayerController : MonoBehaviour {
             if (Input.GetKeyDown(Up))
             {
                 destination = new Vector3(transform.position.x, transform.position.y, AttackRange);
+                transform.LookAt(destination);
                 attackAnimation = AttackAnimation(destination, AttackSpeed);
                 StartCoroutine(attackAnimation);
             }
             if (Input.GetKeyDown(Down))
             {
                 destination = new Vector3(transform.position.x, transform.position.y, -AttackRange);
+                transform.LookAt(destination);
                 attackAnimation = AttackAnimation(destination, AttackSpeed);
                 StartCoroutine(attackAnimation);
             }
             if (Input.GetKeyDown(Right))
             {
                 destination = new Vector3(AttackRange, transform.position.y, transform.position.z);
+                transform.LookAt(destination);
                 attackAnimation = AttackAnimation(destination, AttackSpeed);
                 StartCoroutine(attackAnimation);
             }
             if (Input.GetKeyDown(Left))
             {
                 destination = new Vector3(-AttackRange, transform.position.y, transform.position.z);
-                attackAnimation = AttackAnimation(destination, AttackSpeed);
-                StartCoroutine(attackAnimation);
+                transform.LookAt(destination);
+                attackAnimation = AttackAnimation(destination, AttackSpeed);   
+                StartCoroutine(attackAnimation); 
             }
         }
 
-        if (Input.GetKeyDown(colorChange))
+        if (Input.GetKeyDown(colorChange) && !isJumping)
         {
             ColorChange();
         }
@@ -105,7 +113,7 @@ public class PlayerController : MonoBehaviour {
 
     public void Die()
     {
-        Destroy(gameObject);
+        animator.SetTrigger("Death");
         ScoreCanvas.SetActive(false);
         GameOverScreen.SetActive(true);
     }
@@ -114,6 +122,7 @@ public class PlayerController : MonoBehaviour {
     {
         hasFinishedAnimation = false;
         isAttacking = true;
+        animator.SetTrigger("Attack");
         while (transform.position != destination)
         {
             transform.position = Vector3.MoveTowards(transform.position, destination, speed * Time.deltaTime);
@@ -140,6 +149,8 @@ public class PlayerController : MonoBehaviour {
         float startHeight = transform.position.y;
         float peakHeight = 2f;
         float percent = 0;
+        isJumping = true;
+        animator.SetTrigger("Jump");
 
         while(percent <= 1)
         {
@@ -151,7 +162,7 @@ public class PlayerController : MonoBehaviour {
 
             yield return null;
         }
-
+        isJumping = false;
     }
 
     void ColorChange()
